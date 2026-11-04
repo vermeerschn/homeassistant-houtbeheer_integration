@@ -27,6 +27,8 @@ class WoodStore:
             sheds.setdefault(str(number), {"wood_type": "Anders", "draft_moisture": None, "moisture": None, "last_measurement": None})
         for shed in sheds.values():
             shed.pop("custom_wood_type", None)
+            shed.setdefault("active", False)
+            shed.setdefault("filled_date", None)
 
     @property
     def shed_count(self) -> int:
@@ -50,6 +52,17 @@ class WoodStore:
             return
         shed["moisture"] = shed["draft_moisture"]
         shed["last_measurement"] = datetime.now().astimezone().isoformat()
+        await self.async_save()
+
+    async def async_reset_shed(self, number: int) -> None:
+        self.shed(number).update({
+            "wood_type": "Geen houtsoort",
+            "draft_moisture": None,
+            "moisture": None,
+            "last_measurement": None,
+            "active": False,
+            "filled_date": None,
+        })
         await self.async_save()
 
     @callback

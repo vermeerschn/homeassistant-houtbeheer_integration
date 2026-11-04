@@ -61,7 +61,8 @@ class HoutbeheerCard extends HTMLElement {
       invoer:this.find(n,'number','Nieuwe vochtmeting'),
       opslaan:this.find(n,'button','Meting opslaan'),
       vocht:this.find(n,'sensor','Opgeslagen vochtgehalte'),
-      datum:this.find(n,'sensor','Laatste meting')}));
+      datum:this.find(n,'sensor','Laatste meting'),
+      vuldatum:this.find(n,'date','Vuldatum')}));
   }
   escape(value) { return String(value ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
   state(id) { return this._hass?.states[id]; }
@@ -92,6 +93,7 @@ class HoutbeheerCard extends HTMLElement {
         .hok{padding:12px 5px;align-items:center;min-width:0}.wood-type{font-size:13px;overflow-wrap:anywhere}.hok.ready{background:rgba(54,134,71,.14);border-color:var(--success-color,#368647)}.hok.ready.active{border-color:var(--primary-color);box-shadow:inset 0 0 0 1px var(--primary-color)}.ready small{color:var(--success-color,#368647)}.status{display:block;border-radius:7px;padding:5px 4px;font-size:11px;font-weight:700;line-height:1.4;width:100%;box-sizing:border-box}.status-ready{background:var(--success-color,#368647);color:white}.status-wet{background:rgba(230,153,0,.15);color:var(--primary-text-color)}.status-unknown{background:var(--secondary-background-color);color:var(--secondary-text-color)}label{display:block;font-size:14px;margin-bottom:7px}select,input{width:100%;padding:12px;border:1px solid var(--divider-color);border-radius:10px;background:var(--secondary-background-color);color:inherit;min-height:46px}
         .fields{display:grid;grid-template-columns:1fr 1fr;gap:14px}.info{margin:16px 0;font-size:14px;line-height:1.7;color:var(--secondary-text-color)}.save{width:100%;background:var(--primary-color);color:var(--text-primary-color,#fff);border:0;font-weight:600;padding:14px}
         button:disabled,select:disabled,input:disabled{opacity:.5;cursor:default}.message{margin-top:12px;font-size:14px;color:var(--success-color,#368647)}.error{color:var(--error-color,#db4437)}
+        .hok.take-wood{outline:3px solid #d99000;outline-offset:1px}.take-badge{background:#ffcf64;color:#342300;font-size:12px;font-weight:800;padding:7px 3px;border-radius:7px;width:100%;box-sizing:border-box}.permission{width:100%;margin:12px 0;font-weight:600}.permission.enabled{background:#ffcf64;color:#342300}.permission-note{font-size:13px;color:var(--secondary-text-color);margin-bottom:12px}
         @media(max-width:380px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}.fields{grid-template-columns:1fr}}
       </style>
       <ha-card><h2>${e(this.config.title)}</h2><p>Kies een hok en bevestig je nieuwe meting.</p>
@@ -100,15 +102,17 @@ class HoutbeheerCard extends HTMLElement {
         const moisture=this.state(s.vocht)?.state;const valid=this.valid(moisture);
         const ready=valid&&Number(moisture)<20;
         const woodType=this.state(s.houtsoort)?.state;
-        return `<button class="hok ${s.nummer===this.selected?'active':''} ${ready?'ready':''}" data-hok="${e(s.nummer)}"><strong>${e(s.naam || `Hok ${s.nummer}`)}</strong><span class="wood-type">${this.valid(woodType)?e(woodType):'Geen houtsoort'}</span><small>${valid?e(moisture)+'%':'Geen meting'}</small><span class="status ${ready?'status-ready':valid?'status-wet':'status-unknown'}">${ready?'🔥 Stookklaar':valid?'💧 Nog drogen':'— Niet gemeten'}</span></button>`;
+        const allowed=this.state(s.actief)?.state==='on';
+        return `<button class="hok ${s.nummer===this.selected?'active':''} ${ready?'ready':''} ${allowed?'take-wood':''}" data-hok="${e(s.nummer)}"><strong>${e(s.naam || `Hok ${s.nummer}`)}</strong><span class="wood-type">${this.valid(woodType)?e(woodType):'Geen houtsoort'}</span><small>${valid?e(moisture)+'%':'Geen meting'}</small><span class="status ${ready?'status-ready':valid?'status-wet':'status-unknown'}">${ready?'🔥 Stookklaar':valid?'💧 Nog drogen':'— Niet gemeten'}</span>${allowed?'<span class="take-badge">🪵 Neem hier hout</span>':''}</button>`;
       }).join('')}</div>
       <div class="fields"><div><label for="wood">Houtsoort · Hok ${e(shed.nummer)}</label><select id="wood" ${wood?'':'disabled'}>${(wood?.attributes.options||[]).map(option=>`<option ${option===wood.state?'selected':''} value="${e(option)}">${e(option)}</option>`).join('')}</select></div>
       <div><label for="moisture">Nieuwe vochtmeting (%)</label><input id="moisture" type="text" inputmode="decimal" placeholder="Bijvoorbeeld 18,5" value="${e(draft)}" ${this.state(shed.invoer)?'':'disabled'}></div></div>
-      <div class="info">Opgeslagen: <strong>${this.valid(this.state(shed.vocht)?.state)?e(this.state(shed.vocht).state)+'%':'Nog geen meting'}</strong><br>Laatste meting: ${e(this.date(shed.datum))}</div>
+      <div class="fields"><div><label for="filled-date">Hok gevuld op</label><input id="filled-date" type="date" value="${e(this.valid(this.state(shed.vuldatum)?.state)?this.state(shed.vuldatum).state:'')}" ${this.state(shed.vuldatum)&&this.state(shed.vuldatum).state!=='unavailable'?'':'disabled'}></div></div>
+      <div class="info">Gevuld op: ${e(this.valid(this.state(shed.vuldatum)?.state)?this.state(shed.vuldatum).state.split('-').reverse().join('/'):'Nog niet ingesteld')}<br>Opgeslagen: <strong>${this.valid(this.state(shed.vocht)?.state)?e(this.state(shed.vocht).state)+'%':'Nog geen meting'}</strong><br>Laatste meting: ${e(this.date(shed.datum))}</div>
       <button class="save" id="save" ${this.state(shed.opslaan)&&this.state(shed.invoer)?'':'disabled'}>Meting opslaan · Hok ${e(shed.nummer)}</button>
       <div class="message ${this.error?'error':''}" role="status">${e(this.message)}</div>`}</ha-card>`;
     if(this.config.read_only) {
-      this.shadowRoot.querySelector('.fields')?.remove();
+      this.shadowRoot.querySelectorAll('.fields').forEach(el=>el.remove());
       this.shadowRoot.querySelector('#save')?.remove();
       this.shadowRoot.querySelector('.message')?.remove();
       const subtitle=this.shadowRoot.querySelector('ha-card > p');
@@ -123,6 +127,60 @@ class HoutbeheerCard extends HTMLElement {
     if(select) select.onchange=async()=>{
       try{await this._hass.callService('select','select_option',{entity_id:shed.houtsoort,option:select.value});}
       catch(error){this.message=error.message||'Houtsoort wijzigen mislukt.';this.error=true;this.render();}
+    };
+    if(shed && shed.actief && !this.config.read_only) {
+      const enabled=this.state(shed.actief)?.state==='on';
+      const toggle=document.createElement('button');
+      toggle.className=`permission ${enabled?'enabled':''}`;
+      toggle.textContent=enabled?'🪵 Actief hok — hout nemen toegestaan':'Dit hok actief maken';
+      toggle.setAttribute('aria-pressed',String(enabled));
+      toggle.onclick=async()=>{
+        toggle.disabled=true;
+        try {
+          await this._hass.callService('switch',enabled?'turn_off':'turn_on',{entity_id:shed.actief});
+        } catch(error) {
+          this.error=true;this.message=error.message||'Actieve status wijzigen mislukt.';
+        } finally {toggle.disabled=false;this.render();}
+      };
+      this.shadowRoot.querySelector('.info')?.before(toggle);
+      const note=document.createElement('div');note.className='permission-note';
+      note.textContent='Handmatige toestemming om hout te nemen; onafhankelijk van het vochtpercentage. Meerdere hokken kunnen actief zijn.';
+      toggle.after(note);
+    }
+    if(shed && shed.reset && !this.config.read_only) {
+      const reset=document.createElement('button');
+      reset.textContent='Reset hok';
+      reset.style.cssText='width:100%;margin-top:12px;color:var(--error-color,#db4437)';
+      reset.onclick=async()=>{
+        if(this.busy)return;
+        const name=shed.naam || `Hok ${shed.nummer}`;
+        if(!window.confirm(`${name} resetten? De houtsoort, nieuwe invoer, opgeslagen meting, meetdatum en vuldatum worden gewist. Het hok wordt niet-actief. Dit kan niet ongedaan worden gemaakt.`))return;
+        this.shadowRoot.querySelector('input')?.blur();
+        this.shadowRoot.querySelector('select')?.blur();
+        this.busy=true;
+        this.shadowRoot.querySelectorAll('button,input,select').forEach(el=>el.disabled=true);
+        reset.textContent='Hok resetten…';
+        try {
+          await this._hass.callService('button','press',{entity_id:shed.reset});
+          delete this.drafts[shed.nummer];
+          this.error=false;this.message=`${name} is gereset.`;
+        } catch(error) {
+          this.error=true;this.message=error.message||'Resetten mislukt.';
+        } finally {this.busy=false;this.render();}
+      };
+      this.shadowRoot.querySelector('#save')?.after(reset);
+    }
+    const filled=this.shadowRoot.querySelector('#filled-date');
+    if(filled) filled.onchange=async()=>{
+      if(this.busy)return;
+      if(!filled.value){filled.value=this.valid(this.state(shed.vuldatum)?.state)?this.state(shed.vuldatum).state:'';return;}
+      const value=filled.value;filled.blur();this.busy=true;filled.disabled=true;
+      try {
+        await this._hass.callService('date','set_value',{entity_id:shed.vuldatum,date:value});
+        this.error=false;this.message='Vuldatum opgeslagen.';
+      } catch(error) {
+        this.error=true;this.message=error.message||'Vuldatum opslaan mislukt.';
+      } finally {this.busy=false;this.render();}
     };
     const save=this.shadowRoot.querySelector('#save');if(save) save.onclick=()=>this.save(shed);
   }

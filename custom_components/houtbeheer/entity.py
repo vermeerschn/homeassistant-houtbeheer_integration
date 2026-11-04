@@ -15,9 +15,12 @@ class WoodEntity(Entity):
             "WoodTypeSelect": "houtsoort",
             "DraftMoistureNumber": "invoer",
             "SaveMeasurementButton": "opslaan",
+            "ResetShedButton": "reset",
             "MoistureSensor": "vocht",
             "LastMeasurementSensor": "datum",
             "ReadyToBurnSensor": "stookklaar",
+            "ActiveShedSwitch": "actief",
+            "FilledDateEntity": "vuldatum",
         }
         return {
             "houtbeheer_hok": self.number,

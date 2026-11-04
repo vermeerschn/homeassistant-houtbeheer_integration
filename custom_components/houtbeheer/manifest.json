@@ -1,0 +1,8 @@
+{
+  "domain": "houtbeheer",
+  "name": "Houtbeheer",
+  "version": "1.0.0",
+  "documentation": "https://example.invalid/houtbeheer",
+  "config_flow": true,
+  "iot_class": "local_push"
+}

@@ -1,0 +1,4 @@
+{
+  "config": {"step": {"user": {"data": {"sheds": "Aantal houthokken"}}}},
+  "options": {"step": {"init": {"data": {"sheds": "Aantal houthokken"}}}}
+}

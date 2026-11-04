@@ -18,8 +18,4 @@ class LastMeasurementSensor(WoodEntity, SensorEntity):
         from homeassistant.util import dt as dt_util
         value = self.store.shed(self.number)["last_measurement"]
         return dt_util.parse_datetime(value) if value else None
-class CustomWoodTypeSensor(WoodEntity, SensorEntity):
-    _attr_icon = "mdi:tree-outline"
-    def __init__(self, store, number): super().__init__(store, number); self._attr_name = "Eigen houtsoort"; self._attr_unique_id = f"houtbeheer_{number}_custom_wood_type"
-    @property
-    def native_value(self): return self.store.shed(self.number)["custom_wood_type"] or "Niet ingesteld"
+

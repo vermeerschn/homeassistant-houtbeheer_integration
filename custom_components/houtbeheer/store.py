@@ -24,7 +24,9 @@ class WoodStore:
         count = int(self.entry.options.get("sheds", self.entry.data.get("sheds", 12)))
         sheds = self.data.setdefault("sheds", {})
         for number in range(1, count + 1):
-            sheds.setdefault(str(number), {"wood_type": "Anders", "custom_wood_type": "", "draft_moisture": None, "moisture": None, "last_measurement": None})
+            sheds.setdefault(str(number), {"wood_type": "Anders", "draft_moisture": None, "moisture": None, "last_measurement": None})
+        for shed in sheds.values():
+            shed.pop("custom_wood_type", None)
 
     @property
     def shed_count(self) -> int:

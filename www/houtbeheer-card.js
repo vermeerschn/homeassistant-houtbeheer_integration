@@ -34,10 +34,23 @@ class HoutbeheerCard extends HTMLElement {
   sheds() {
     if (!this._hass) return [];
     if (this.config.hokken) return this.config.hokken;
+    const groups = new Map();
+    for (const [id, state] of Object.entries(this._hass.states)) {
+      const a = state.attributes;
+      if (!a.houtbeheer_id || !a.houtbeheer_rol) continue;
+      if (!groups.has(a.houtbeheer_id)) groups.set(a.houtbeheer_id, {nummer:Number(a.houtbeheer_hok)});
+      const shed = groups.get(a.houtbeheer_id);
+      shed[a.houtbeheer_rol] = id;
+      const registry = this._hass.entities?.[id];
+      const device = registry && this._hass.devices?.[registry.device_id];
+      if (device) shed.naam = device.name_by_user || device.name;
+    }
+    if (groups.size) return [...groups.values()].filter(s=>s.opslaan).sort((a,b)=>a.nummer-b.nummer);
     const numbers = new Set();
     for (const [id,state] of Object.entries(this._hass.states)) {
       if (!id.startsWith('button.')) continue;
-      const match = this.normalize(state.attributes.friendly_name).match(/^houthok (\d+) meting opslaan$/);
+      const match = this.normalize(state.attributes.friendly_name).match(/^houthok (\d+) meting opslaan$/)
+        || id.match(/^button\.houthok_(\d+)_meting_opslaan(?:_\d+)?$/);
       if (match) numbers.add(Number(match[1]));
     }
     if (this.config.aantal_hokken) {
@@ -87,7 +100,7 @@ class HoutbeheerCard extends HTMLElement {
         const moisture=this.state(s.vocht)?.state;const valid=this.valid(moisture);
         const ready=valid&&Number(moisture)<20;
         const woodType=this.state(s.houtsoort)?.state;
-        return `<button class="hok ${s.nummer===this.selected?'active':''} ${ready?'ready':''}" data-hok="${e(s.nummer)}"><strong>Hok ${e(s.nummer)}</strong><span class="wood-type">${this.valid(woodType)?e(woodType):'Geen houtsoort'}</span><small>${valid?e(moisture)+'%':'Geen meting'}</small><span class="status ${ready?'status-ready':valid?'status-wet':'status-unknown'}">${ready?'🔥 Stookklaar':valid?'💧 Nog drogen':'— Niet gemeten'}</span></button>`;
+        return `<button class="hok ${s.nummer===this.selected?'active':''} ${ready?'ready':''}" data-hok="${e(s.nummer)}"><strong>${e(s.naam || `Hok ${s.nummer}`)}</strong><span class="wood-type">${this.valid(woodType)?e(woodType):'Geen houtsoort'}</span><small>${valid?e(moisture)+'%':'Geen meting'}</small><span class="status ${ready?'status-ready':valid?'status-wet':'status-unknown'}">${ready?'🔥 Stookklaar':valid?'💧 Nog drogen':'— Niet gemeten'}</span></button>`;
       }).join('')}</div>
       <div class="fields"><div><label for="wood">Houtsoort · Hok ${e(shed.nummer)}</label><select id="wood" ${wood?'':'disabled'}>${(wood?.attributes.options||[]).map(option=>`<option ${option===wood.state?'selected':''} value="${e(option)}">${e(option)}</option>`).join('')}</select></div>
       <div><label for="moisture">Nieuwe vochtmeting (%)</label><input id="moisture" type="text" inputmode="decimal" placeholder="Bijvoorbeeld 18,5" value="${e(draft)}" ${this.state(shed.invoer)?'':'disabled'}></div></div>

@@ -1,6 +1,6 @@
 # Houtbeheer
 
-Een lokale Home Assistant-integratie voor houthokken. Per hok krijg je een keuzelijst voor de houtsoort, een veld **Eigen houtsoort**, een invoerveld **Nieuwe vochtmeting**, de knop **Meting opslaan**, een sensor voor het opgeslagen vochtgehalte en een tijdstempel voor de laatste meting.
+Een lokale Home Assistant-integratie voor houthokken. Per hok krijg je een houtsoortkeuzelijst, een invoerveld **Nieuwe vochtmeting**, de knop **Meting opslaan**, het opgeslagen vochtgehalte en de laatste meetdatum. Stabiele hokmetadata zorgt dat de bijbehorende kaart entiteiten ook na hernoemen herkent.
 
 ## Installeren
 1. Plaats `installeer_houtbeheer.sh` in de map `/config` van Home Assistant.

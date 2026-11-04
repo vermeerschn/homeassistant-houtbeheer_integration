@@ -1,8 +1,8 @@
 {
   "domain": "houtbeheer",
   "name": "Houtbeheer",
-  "version": "1.0.0",
-  "documentation": "https://example.invalid/houtbeheer",
+  "version": "1.1.0",
+  "documentation": "https://github.com/vermeerschn/homeassistant-houtbeheer",
   "config_flow": true,
   "iot_class": "local_push"
 }

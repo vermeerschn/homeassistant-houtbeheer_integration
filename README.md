@@ -24,7 +24,9 @@ Een lokale Home Assistant custom integratie inclusief bijhorende Lovelace dashbo
 4. Zoek naar **Houtbeheer** en kies het aantal houthokken.
 
 ### 2. Dashboardkaart installeren
-1. Kopieer het bestand `www/houtbeheer-card.js` naar de map `/config/www/` in Home Assistant.
+De kaart staat in een eigen repository: [homeassistant-houtbeheer_card](https://github.com/vermeerschn/homeassistant-houtbeheer_card). Daar vind je ook de installatie via HACS en alle kaartopties. Handmatig gaat het zo:
+
+1. Download `houtbeheer-card.js` uit die repository en plaats het in de map `/config/www/` in Home Assistant.
 2. Ga naar **Instellingen → Dashboards → Drie puntjes rechtsboven → Bronnen** *(of via Instellingen > Dashboards > Bronnen indien Geavanceerde modus aan staat)*.
 3. Voeg een nieuwe bron toe:
    - **URL**: `/local/houtbeheer-card.js`

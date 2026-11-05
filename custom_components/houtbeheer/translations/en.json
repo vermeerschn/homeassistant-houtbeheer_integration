@@ -17,9 +17,11 @@
       "init": {
         "data": {
           "sheds": "Number of wood sheds",
+          "ready_threshold": "Ready to burn below (%)",
           "wood_types": "Wood types"
         },
         "data_description": {
+          "ready_threshold": "A shed is ready to burn when its saved moisture is below this limit. Default 20%.",
           "wood_types": "Wood types you can choose per shed. Type to add a new one; remove one with the cross. The order here is the order on the card. A type that is still in a shed cannot be removed."
         }
       }
@@ -40,7 +42,7 @@
         },
         "wood_types": {
           "name": "Wood types",
-          "description": "One or more wood types stored in this shed."
+          "description": "One or more wood types stored in this shed, from the list in the integration options."
         }
       }
     }

@@ -6,9 +6,9 @@ Een lokale Home Assistant custom integratie inclusief bijhorende Lovelace dashbo
 
 - **Flexibel aantal houthokken**: instelbaar bij installatie en later aanpasbaar via het tandwiel in de integratie.
 - **Meerdere houtsoorten per hok**: kies uit een eigen lijst. Standaard: Den, Eik, Beuk, Laurier, Kastanje, Es, Haagbeuk, Berk, Appel, Acacia, Esdoorn, Spar, Populier, Wilg en Anders. De keuze wordt als lijst bewaard (attribuut `houtsoorten` van `sensor.houthok_N_houtsoorten`). Een leeg of net gereset hok staat op *Geen houtsoort*. Het vochtpercentage blijft per hok, niet per houtsoort.
-- **Handmatige metingen met bevestiging**: stel het gemeten vochtpercentage in en klik op **Meting opslaan** om zowel de waarde als het exacte tijdstip vast te leggen.
+- **Handmatige metingen met bevestiging**: stel het gemeten vochtpercentage in en klik op **Meting opslaan** om zowel de waarde als het exacte tijdstip vast te leggen. Na het opslaan wordt het invoerveld leeggemaakt, zodat dezelfde waarde niet per ongeluk twee keer wordt opgeslagen.
 - **Laatste 5 metingen per hok**: datum en percentage staan als lijst in het attribuut `metingen` van `sensor.houthok_N_opgeslagen_vochtgehalte`. De kaart toont ze als verloopgrafiek. Reset wist de geschiedenis.
-- **Stookklaar-status**: automatische binary sensor die aangeeft of het hout onder 20% vocht zit.
+- **Stookklaar-status**: automatische binary sensor die aangeeft of het hout onder de ingestelde grens zit (standaard 20%, instelbaar in de opties). De grens staat als attribuut `grens` op `binary_sensor.houthok_N_stookklaar`.
 - **Actief hok**: schakelaar per hok om aan te geven uit welk hok je hout mag nemen, los van het vochtpercentage. Meerdere hokken kunnen actief zijn.
 - **Vuldatum**: per hok instelbaar, zonder tijdstip.
 - **Reset**: knop die een hok leegmaakt (houtsoorten, invoer, meting, meetgeschiedenis, meetdatum, vuldatum en actief-status).
@@ -40,6 +40,12 @@ De kaart staat in een eigen repository: [homeassistant-houtbeheer_card](https://
 
 ---
 
+## Stookklaar-grens instellen
+
+Ga naar **Instellingen → Apparaten & diensten → Houtbeheer → tandwiel**, waar je ook het aantal hokken aanpast, en vul **Stookklaar onder (%)** in. Toegelaten: 5 tot 40%, in stappen van 0,5. De grens geldt voor alle hokken. Een hok is stookklaar als het opgeslagen vochtpercentage *onder* de grens zit; de dashboardkaart volgt dezelfde grens.
+
+---
+
 ## Houtsoorten instellen
 
 Een Home Assistant-keuzelijst (`select`) kan maar één waarde bevatten. Daarom is de houtsoort een sensor met een lijst-attribuut, en stel je de keuze in via de actie `houtbeheer.set_wood_types`. De dashboardkaart doet dit voor je met aanvinkvakjes. Zelf aanroepen kan ook:
@@ -62,6 +68,11 @@ Ga naar **Instellingen → Apparaten & diensten → Houtbeheer → tandwiel** en
 - Namen mogen maximaal 30 tekens zijn, zonder komma, en niet *Geen houtsoort*. Er kunnen maximaal 50 soorten in de lijst.
 - Hernoemen kan niet rechtstreeks: voeg de nieuwe naam toe, zet de hokken om en verwijder daarna de oude.
 - De actie `houtbeheer.set_wood_types` accepteert enkel soorten uit deze lijst.
+
+### Upgraden naar 1.9.0
+- Vereist Home Assistant 2024.3 of nieuwer.
+- De stookklaar-grens blijft 20% tot je ze in de opties wijzigt.
+- `number.houthok_N_nieuwe_vochtmeting` is na *Meting opslaan* leeg (`unknown`). Automatiseringen die deze waarde na het opslaan lazen, gebruiken beter `sensor.houthok_N_opgeslagen_vochtgehalte`.
 
 ### Upgraden van 1.4.1 of ouder
 - `select.houthok_N_houtsoort` verdwijnt en wordt `sensor.houthok_N_houtsoorten`. Pas automatiseringen of dashboards aan die de oude entiteit gebruikten.

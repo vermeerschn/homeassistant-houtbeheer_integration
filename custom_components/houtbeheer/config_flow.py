@@ -4,10 +4,14 @@ from typing import Any
 import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.data_entry_flow import FlowResult
-from homeassistant.helpers.selector import SelectSelector, SelectSelectorConfig, SelectSelectorMode
+from homeassistant.helpers.selector import (
+    NumberSelector, NumberSelectorConfig, NumberSelectorMode,
+    SelectSelector, SelectSelectorConfig, SelectSelectorMode,
+)
 from .const import (
-    CONF_SHEDS, CONF_WOOD_TYPES, DEFAULT_SHEDS, DEFAULT_WOOD_TYPES, DOMAIN,
-    MAX_WOOD_NAME_LENGTH, MAX_WOOD_TYPES, NO_WOOD_TYPE,
+    CONF_READY_THRESHOLD, CONF_SHEDS, CONF_WOOD_TYPES, DEFAULT_READY_THRESHOLD, DEFAULT_SHEDS,
+    DEFAULT_WOOD_TYPES, DOMAIN, MAX_READY_THRESHOLD, MAX_WOOD_NAME_LENGTH, MAX_WOOD_TYPES,
+    MIN_READY_THRESHOLD, NO_WOOD_TYPE,
 )
 
 def clean_wood_types(values) -> list[str] | None:
@@ -54,6 +58,7 @@ class HoutbeheerOptionsFlow(config_entries.OptionsFlow):
 
     async def async_step_init(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         current_sheds = self._entry.options.get(CONF_SHEDS, self._entry.data.get(CONF_SHEDS, DEFAULT_SHEDS))
+        current_threshold = float(self._entry.options.get(CONF_READY_THRESHOLD, DEFAULT_READY_THRESHOLD))
         current_woods = list(self._entry.options.get(CONF_WOOD_TYPES, DEFAULT_WOOD_TYPES))
         errors: dict[str, str] = {}
         placeholders = {"in_use": ""}
@@ -75,14 +80,24 @@ class HoutbeheerOptionsFlow(config_entries.OptionsFlow):
                     offered = list(user_input[CONF_WOOD_TYPES])
                 else:
                     return self.async_create_entry(
-                        title="", data={CONF_SHEDS: user_input[CONF_SHEDS], CONF_WOOD_TYPES: woods}
+                        title="",
+                        data={
+                            CONF_SHEDS: user_input[CONF_SHEDS],
+                            CONF_READY_THRESHOLD: float(user_input[CONF_READY_THRESHOLD]),
+                            CONF_WOOD_TYPES: woods,
+                        },
                     )
         sheds = user_input[CONF_SHEDS] if user_input else current_sheds
+        threshold = user_input[CONF_READY_THRESHOLD] if user_input else current_threshold
         options = list(dict.fromkeys([*offered, *current_woods]))
         return self.async_show_form(
             step_id="init",
             data_schema=vol.Schema({
                 vol.Required(CONF_SHEDS, default=sheds): vol.All(vol.Coerce(int), vol.Range(min=1, max=50)),
+                vol.Required(CONF_READY_THRESHOLD, default=threshold): NumberSelector(NumberSelectorConfig(
+                    min=MIN_READY_THRESHOLD, max=MAX_READY_THRESHOLD, step=0.5,
+                    unit_of_measurement="%", mode=NumberSelectorMode.BOX,
+                )),
                 vol.Required(CONF_WOOD_TYPES, default=offered): SelectSelector(SelectSelectorConfig(
                     options=options, multiple=True, custom_value=True, mode=SelectSelectorMode.DROPDOWN,
                 )),

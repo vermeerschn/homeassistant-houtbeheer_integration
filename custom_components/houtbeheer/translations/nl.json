@@ -17,9 +17,11 @@
       "init": {
         "data": {
           "sheds": "Aantal houthokken",
+          "ready_threshold": "Stookklaar onder (%)",
           "wood_types": "Houtsoorten"
         },
         "data_description": {
+          "ready_threshold": "Een hok is stookklaar als het opgeslagen vochtpercentage onder deze grens zit. Standaard 20%.",
           "wood_types": "Houtsoorten die je per hok kan kiezen. Typ om een nieuwe toe te voegen; verwijder een soort met het kruisje. De volgorde hier is de volgorde op de kaart. Een soort die nog in een hok zit, kan je niet verwijderen."
         }
       }
@@ -40,7 +42,7 @@
         },
         "wood_types": {
           "name": "Houtsoorten",
-          "description": "Eén of meer houtsoorten die in dit hok liggen."
+          "description": "Eén of meer houtsoorten die in dit hok liggen, uit de lijst in de opties van de integratie."
         }
       }
     }

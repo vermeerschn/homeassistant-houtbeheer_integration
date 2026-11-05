@@ -5,7 +5,10 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import ServiceValidationError
 from homeassistant.helpers.storage import Store
-from .const import CONF_WOOD_TYPES, DEFAULT_WOOD_TYPES, DOMAIN, HISTORY_SIZE, STORAGE_VERSION
+from .const import (
+    CONF_READY_THRESHOLD, CONF_WOOD_TYPES, DEFAULT_READY_THRESHOLD, DEFAULT_WOOD_TYPES, DOMAIN,
+    HISTORY_SIZE, STORAGE_VERSION,
+)
 
 def _empty_shed() -> dict:
     """Een leeg hok; gedeeld door nieuwe hokken en reset, zodat ze nooit uiteenlopen."""
@@ -65,6 +68,11 @@ class WoodStore:
         """De houtsoorten die gekozen mogen worden (instelbaar in de opties van de integratie)."""
         return list(self.entry.options.get(CONF_WOOD_TYPES, DEFAULT_WOOD_TYPES))
 
+    @property
+    def ready_threshold(self) -> float:
+        """Vochtpercentage waaronder een hok stookklaar is (instelbaar in de opties van de integratie)."""
+        return float(self.entry.options.get(CONF_READY_THRESHOLD, DEFAULT_READY_THRESHOLD))
+
     def wood_types_in_use(self) -> dict[str, list[int]]:
         """Per houtsoort de hokken waarin ze nu gekozen is (ook verborgen hokken, hun data blijft bewaard)."""
         used: dict[str, list[int]] = {}
@@ -105,6 +113,8 @@ class WoodStore:
             *shed["history"],
             {"date": shed["last_measurement"], "moisture": shed["moisture"]},
         ][-HISTORY_SIZE:]
+        # Het invoerveld leegmaken, zodat een volgende druk op de knop niet dezelfde waarde nog eens opslaat.
+        shed["draft_moisture"] = None
         await self.async_save()
 
     async def async_reset_shed(self, number: int) -> None:

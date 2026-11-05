@@ -3,8 +3,20 @@ from __future__ import annotations
 from datetime import datetime
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
+from homeassistant.exceptions import ServiceValidationError
 from homeassistant.helpers.storage import Store
-from .const import DOMAIN, STORAGE_VERSION
+from .const import DOMAIN, NO_WOOD_TYPE, STORAGE_VERSION
+
+def _empty_shed() -> dict:
+    """Een leeg hok; gedeeld door nieuwe hokken en reset, zodat ze nooit uiteenlopen."""
+    return {
+        "wood_type": NO_WOOD_TYPE,
+        "draft_moisture": None,
+        "moisture": None,
+        "last_measurement": None,
+        "active": False,
+        "filled_date": None,
+    }
 
 class WoodStore:
     def __init__(self, hass: HomeAssistant, entry: ConfigEntry) -> None:
@@ -24,7 +36,7 @@ class WoodStore:
         count = int(self.entry.options.get("sheds", self.entry.data.get("sheds", 12)))
         sheds = self.data.setdefault("sheds", {})
         for number in range(1, count + 1):
-            sheds.setdefault(str(number), {"wood_type": "Anders", "draft_moisture": None, "moisture": None, "last_measurement": None})
+            sheds.setdefault(str(number), _empty_shed())
         for shed in sheds.values():
             shed.pop("custom_wood_type", None)
             shed.setdefault("active", False)
@@ -49,20 +61,15 @@ class WoodStore:
     async def async_save_measurement(self, number: int) -> None:
         shed = self.shed(number)
         if shed["draft_moisture"] is None:
-            return
+            raise ServiceValidationError(
+                f"Houthok {number}: vul eerst een nieuwe vochtmeting in voordat je de meting opslaat."
+            )
         shed["moisture"] = shed["draft_moisture"]
         shed["last_measurement"] = datetime.now().astimezone().isoformat()
         await self.async_save()
 
     async def async_reset_shed(self, number: int) -> None:
-        self.shed(number).update({
-            "wood_type": "Geen houtsoort",
-            "draft_moisture": None,
-            "moisture": None,
-            "last_measurement": None,
-            "active": False,
-            "filled_date": None,
-        })
+        self.shed(number).update(_empty_shed())
         await self.async_save()
 
     @callback

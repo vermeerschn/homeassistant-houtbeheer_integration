@@ -14,7 +14,7 @@ class WoodEntity(Entity):
     @property
     def extra_state_attributes(self):
         roles = {
-            "WoodTypeSelect": "houtsoort",
+            "WoodTypesSensor": "houtsoort",
             "DraftMoistureNumber": "invoer",
             "SaveMeasurementButton": "opslaan",
             "ResetShedButton": "reset",

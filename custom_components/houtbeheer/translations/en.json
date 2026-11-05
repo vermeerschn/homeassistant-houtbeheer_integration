@@ -3,5 +3,15 @@
     "step": {"user": {"data": {"sheds": "Number of wood sheds"}}},
     "abort": {"already_configured": "Houtbeheer is already set up.", "single_instance_allowed": "Only one Houtbeheer integration can be set up."}
   },
-  "options": {"step": {"init": {"data": {"sheds": "Number of wood sheds"}}}}
+  "options": {"step": {"init": {"data": {"sheds": "Number of wood sheds"}}}},
+  "services": {
+    "set_wood_types": {
+      "name": "Set wood types",
+      "description": "Sets the wood types of a wood shed. An empty list means no wood type.",
+      "fields": {
+        "shed": {"name": "Wood shed", "description": "Number of the wood shed."},
+        "wood_types": {"name": "Wood types", "description": "One or more wood types stored in this shed."}
+      }
+    }
+  }
 }

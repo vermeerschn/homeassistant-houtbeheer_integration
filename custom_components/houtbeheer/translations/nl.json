@@ -3,5 +3,15 @@
     "step": {"user": {"data": {"sheds": "Aantal houthokken"}}},
     "abort": {"already_configured": "Houtbeheer is al ingesteld.", "single_instance_allowed": "Er kan maar één Houtbeheer-integratie worden ingesteld."}
   },
-  "options": {"step": {"init": {"data": {"sheds": "Aantal houthokken"}}}}
+  "options": {"step": {"init": {"data": {"sheds": "Aantal houthokken"}}}},
+  "services": {
+    "set_wood_types": {
+      "name": "Houtsoorten instellen",
+      "description": "Stelt de houtsoorten van een houthok in. Een lege lijst betekent: geen houtsoort.",
+      "fields": {
+        "shed": {"name": "Houthok", "description": "Nummer van het houthok."},
+        "wood_types": {"name": "Houtsoorten", "description": "Eén of meer houtsoorten die in dit hok liggen."}
+      }
+    }
+  }
 }

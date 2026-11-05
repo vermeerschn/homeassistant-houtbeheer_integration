@@ -5,18 +5,23 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import ServiceValidationError
 from homeassistant.helpers.storage import Store
-from .const import DOMAIN, NO_WOOD_TYPE, STORAGE_VERSION
+from .const import DOMAIN, STORAGE_VERSION, WOOD_TYPES
 
 def _empty_shed() -> dict:
     """Een leeg hok; gedeeld door nieuwe hokken en reset, zodat ze nooit uiteenlopen."""
     return {
-        "wood_type": NO_WOOD_TYPE,
+        "wood_types": [],
         "draft_moisture": None,
         "moisture": None,
         "last_measurement": None,
         "active": False,
         "filled_date": None,
     }
+
+def _normalize_wood_types(wood_types) -> list[str]:
+    """Alleen bekende houtsoorten, zonder dubbels en altijd in dezelfde volgorde."""
+    chosen = set(wood_types or [])
+    return [wood for wood in WOOD_TYPES if wood in chosen]
 
 class WoodStore:
     def __init__(self, hass: HomeAssistant, entry: ConfigEntry) -> None:
@@ -41,6 +46,11 @@ class WoodStore:
             shed.pop("custom_wood_type", None)
             shed.setdefault("active", False)
             shed.setdefault("filled_date", None)
+            if "wood_types" not in shed:
+                # Migratie vanaf versie 1.4.1 en ouder: één houtsoort als tekst wordt een lijst.
+                # "Geen houtsoort" is geen houtsoort en wordt dus een lege lijst.
+                shed["wood_types"] = _normalize_wood_types([shed.get("wood_type")])
+            shed.pop("wood_type", None)
 
     @property
     def shed_count(self) -> int:
@@ -56,6 +66,10 @@ class WoodStore:
 
     async def async_set(self, number: int, key: str, value) -> None:
         self.shed(number)[key] = value
+        await self.async_save()
+
+    async def async_set_wood_types(self, number: int, wood_types: list[str]) -> None:
+        self.shed(number)["wood_types"] = _normalize_wood_types(wood_types)
         await self.async_save()
 
     async def async_save_measurement(self, number: int) -> None:

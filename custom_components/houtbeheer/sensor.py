@@ -1,9 +1,10 @@
 from homeassistant.components.sensor import SensorDeviceClass, SensorEntity, SensorStateClass
+from .const import ATTR_WOOD_OPTIONS, ATTR_WOOD_TYPES, NO_WOOD_TYPE, WOOD_TYPES
 from .entity import WoodEntity
 async def async_setup_entry(hass, entry, async_add_entities):
     store = hass.data["houtbeheer"][entry.entry_id]
     entities = []
-    for n in range(1, store.shed_count + 1): entities += [MoistureSensor(store, n), LastMeasurementSensor(store, n)]
+    for n in range(1, store.shed_count + 1): entities += [WoodTypesSensor(store, n), MoistureSensor(store, n), LastMeasurementSensor(store, n)]
     async_add_entities(entities)
 class MoistureSensor(WoodEntity, SensorEntity):
     _attr_native_unit_of_measurement = "%"; _attr_icon = "mdi:water-percent"
@@ -20,4 +21,21 @@ class LastMeasurementSensor(WoodEntity, SensorEntity):
         from homeassistant.util import dt as dt_util
         value = self.store.shed(self.number)["last_measurement"]
         return dt_util.parse_datetime(value) if value else None
+class WoodTypesSensor(WoodEntity, SensorEntity):
+    """Houtsoorten in dit hok: de state is leesbaar, de lijst zit in het attribuut houtsoorten."""
+    _attr_icon = "mdi:tree"
+    # De lijst met opties is voor de kaart en hoeft niet in de recorder.
+    _unrecorded_attributes = frozenset({ATTR_WOOD_OPTIONS})
+    def __init__(self, store, number): super().__init__(store, number); self._attr_name = "Houtsoorten"; self._attr_unique_id = f"houtbeheer_{number}_wood_types"
+    @property
+    def native_value(self):
+        types = self.store.shed(self.number)["wood_types"]
+        return ", ".join(types) if types else NO_WOOD_TYPE
+    @property
+    def extra_state_attributes(self):
+        return {
+            **super().extra_state_attributes,
+            ATTR_WOOD_TYPES: list(self.store.shed(self.number)["wood_types"]),
+            ATTR_WOOD_OPTIONS: list(WOOD_TYPES),
+        }
 

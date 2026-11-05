@@ -1,0 +1,32 @@
+set_wood_types:
+  fields:
+    shed:
+      required: true
+      example: 1
+      selector:
+        number:
+          min: 1
+          max: 50
+          mode: box
+    wood_types:
+      required: true
+      example: '["Eik", "Beuk"]'
+      selector:
+        select:
+          multiple: true
+          options:
+            - Den
+            - Eik
+            - Beuk
+            - Laurier
+            - Kastanje
+            - Es
+            - Haagbeuk
+            - Berk
+            - Appel
+            - Acacia
+            - Esdoorn
+            - Spar
+            - Populier
+            - Wilg
+            - Anders

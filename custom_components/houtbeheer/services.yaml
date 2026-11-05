@@ -12,22 +12,5 @@ set_wood_types:
       required: true
       example: '["Eik", "Beuk"]'
       selector:
-        select:
+        text:
           multiple: true
-          custom_value: true
-          options:
-            - Den
-            - Eik
-            - Beuk
-            - Laurier
-            - Kastanje
-            - Es
-            - Haagbeuk
-            - Berk
-            - Appel
-            - Acacia
-            - Esdoorn
-            - Spar
-            - Populier
-            - Wilg
-            - Anders

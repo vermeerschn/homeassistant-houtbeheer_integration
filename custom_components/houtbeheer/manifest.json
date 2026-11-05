@@ -6,5 +6,6 @@
   "documentation": "https://github.com/vermeerschn/homeassistant-houtbeheer_integration",
   "iot_class": "local_push",
   "issue_tracker": "https://github.com/vermeerschn/homeassistant-houtbeheer_integration/issues",
+  "single_config_entry": true,
   "version": "1.4.0"
 }

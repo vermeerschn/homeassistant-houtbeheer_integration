@@ -5,7 +5,7 @@ Een lokale Home Assistant custom integratie inclusief bijhorende Lovelace dashbo
 ## Functionaliteiten
 
 - **Flexibel aantal houthokken**: instelbaar bij installatie en later aanpasbaar via het tandwiel in de integratie.
-- **Meerdere houtsoorten per hok**: kies uit Den, Eik, Beuk, Laurier, Kastanje, Es, Haagbeuk, Berk, Appel, Acacia, Esdoorn, Spar, Populier, Wilg en Anders. De keuze wordt als lijst bewaard (attribuut `houtsoorten` van `sensor.houthok_N_houtsoorten`). Een leeg of net gereset hok staat op *Geen houtsoort*. Het vochtpercentage blijft per hok, niet per houtsoort.
+- **Meerdere houtsoorten per hok**: kies uit een eigen lijst. Standaard: Den, Eik, Beuk, Laurier, Kastanje, Es, Haagbeuk, Berk, Appel, Acacia, Esdoorn, Spar, Populier, Wilg en Anders. De keuze wordt als lijst bewaard (attribuut `houtsoorten` van `sensor.houthok_N_houtsoorten`). Een leeg of net gereset hok staat op *Geen houtsoort*. Het vochtpercentage blijft per hok, niet per houtsoort.
 - **Handmatige metingen met bevestiging**: stel het gemeten vochtpercentage in en klik op **Meting opslaan** om zowel de waarde als het exacte tijdstip vast te leggen.
 - **Laatste 5 metingen per hok**: datum en percentage staan als lijst in het attribuut `metingen` van `sensor.houthok_N_opgeslagen_vochtgehalte`. De kaart toont ze als verloopgrafiek. Reset wist de geschiedenis.
 - **Stookklaar-status**: automatische binary sensor die aangeeft of het hout onder 20% vocht zit.
@@ -54,6 +54,14 @@ data:
 ```
 
 Een lege lijst betekent *Geen houtsoort*. Dubbele waarden worden samengevoegd.
+
+### De lijst met houtsoorten aanpassen
+Ga naar **Instellingen → Apparaten & diensten → Houtbeheer → tandwiel** en pas het veld **Houtsoorten** aan. Typ een naam om een soort toe te voegen, of verwijder er een met het kruisje. De volgorde in het veld is de volgorde op de kaart.
+
+- Een soort die nog in een hok zit, kan je niet verwijderen. Het scherm meldt in welke hokken ze zit; pas die eerst aan.
+- Namen mogen maximaal 30 tekens zijn, zonder komma, en niet *Geen houtsoort*. Er kunnen maximaal 50 soorten in de lijst.
+- Hernoemen kan niet rechtstreeks: voeg de nieuwe naam toe, zet de hokken om en verwijder daarna de oude.
+- De actie `houtbeheer.set_wood_types` accepteert enkel soorten uit deze lijst.
 
 ### Upgraden van 1.4.1 of ouder
 - `select.houthok_N_houtsoort` verdwijnt en wordt `sensor.houthok_N_houtsoorten`. Pas automatiseringen of dashboards aan die de oude entiteit gebruikten.

@@ -6,14 +6,14 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.exceptions import ServiceValidationError
 from homeassistant.helpers import config_validation as cv, device_registry as dr, entity_registry as er
-from .const import DOMAIN, PLATFORMS, SERVICE_SET_WOOD_TYPES, WOOD_TYPES
+from .const import DOMAIN, PLATFORMS, SERVICE_SET_WOOD_TYPES
 from .store import WoodStore
 
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
 SET_WOOD_TYPES_SCHEMA = vol.Schema({
     vol.Required("shed"): vol.All(vol.Coerce(int), vol.Range(min=1)),
-    vol.Required("wood_types"): vol.All(cv.ensure_list, [vol.In(WOOD_TYPES)]),
+    vol.Required("wood_types"): vol.All(cv.ensure_list, [cv.string]),
 })
 
 async def async_setup(hass: HomeAssistant, config: dict) -> bool:
@@ -24,6 +24,12 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
         store, number = stores[0], call.data["shed"]
         if number > store.shed_count:
             raise ServiceValidationError(f"Houthok {number} bestaat niet; er zijn {store.shed_count} hokken.")
+        unknown = [wood for wood in call.data["wood_types"] if wood not in store.wood_options]
+        if unknown:
+            raise ServiceValidationError(
+                f"Onbekende houtsoort: {', '.join(unknown)}. Beschikbaar: {', '.join(store.wood_options)}. "
+                "Je past de lijst aan in de opties van de integratie."
+            )
         await store.async_set_wood_types(number, call.data["wood_types"])
 
     hass.services.async_register(DOMAIN, SERVICE_SET_WOOD_TYPES, async_set_wood_types, schema=SET_WOOD_TYPES_SCHEMA)

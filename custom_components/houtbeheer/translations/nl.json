@@ -1,16 +1,47 @@
 {
   "config": {
-    "step": {"user": {"data": {"sheds": "Aantal houthokken"}}},
-    "abort": {"already_configured": "Houtbeheer is al ingesteld.", "single_instance_allowed": "Er kan maar één Houtbeheer-integratie worden ingesteld."}
+    "step": {
+      "user": {
+        "data": {
+          "sheds": "Aantal houthokken"
+        }
+      }
+    },
+    "abort": {
+      "already_configured": "Houtbeheer is al ingesteld.",
+      "single_instance_allowed": "Er kan maar één Houtbeheer-integratie worden ingesteld."
+    }
   },
-  "options": {"step": {"init": {"data": {"sheds": "Aantal houthokken"}}}},
+  "options": {
+    "step": {
+      "init": {
+        "data": {
+          "sheds": "Aantal houthokken",
+          "wood_types": "Houtsoorten"
+        },
+        "data_description": {
+          "wood_types": "Houtsoorten die je per hok kan kiezen. Typ om een nieuwe toe te voegen; verwijder een soort met het kruisje. De volgorde hier is de volgorde op de kaart. Een soort die nog in een hok zit, kan je niet verwijderen."
+        }
+      }
+    },
+    "error": {
+      "wood_types_in_use": "Deze houtsoorten zitten nog in een hok: {in_use}. Pas die hokken eerst aan en verwijder de soort daarna.",
+      "wood_types_invalid": "Gebruik 1 tot 50 verschillende namen van maximaal 30 tekens, zonder komma's en niet \"Geen houtsoort\"."
+    }
+  },
   "services": {
     "set_wood_types": {
       "name": "Houtsoorten instellen",
       "description": "Stelt de houtsoorten van een houthok in. Een lege lijst betekent: geen houtsoort.",
       "fields": {
-        "shed": {"name": "Houthok", "description": "Nummer van het houthok."},
-        "wood_types": {"name": "Houtsoorten", "description": "Eén of meer houtsoorten die in dit hok liggen."}
+        "shed": {
+          "name": "Houthok",
+          "description": "Nummer van het houthok."
+        },
+        "wood_types": {
+          "name": "Houtsoorten",
+          "description": "Eén of meer houtsoorten die in dit hok liggen."
+        }
       }
     }
   }

@@ -1,16 +1,47 @@
 {
   "config": {
-    "step": {"user": {"data": {"sheds": "Number of wood sheds"}}},
-    "abort": {"already_configured": "Houtbeheer is already set up.", "single_instance_allowed": "Only one Houtbeheer integration can be set up."}
+    "step": {
+      "user": {
+        "data": {
+          "sheds": "Number of wood sheds"
+        }
+      }
+    },
+    "abort": {
+      "already_configured": "Houtbeheer is already set up.",
+      "single_instance_allowed": "Only one Houtbeheer integration can be set up."
+    }
   },
-  "options": {"step": {"init": {"data": {"sheds": "Number of wood sheds"}}}},
+  "options": {
+    "step": {
+      "init": {
+        "data": {
+          "sheds": "Number of wood sheds",
+          "wood_types": "Wood types"
+        },
+        "data_description": {
+          "wood_types": "Wood types you can choose per shed. Type to add a new one; remove one with the cross. The order here is the order on the card. A type that is still in a shed cannot be removed."
+        }
+      }
+    },
+    "error": {
+      "wood_types_in_use": "These wood types are still in a shed: {in_use}. Change those sheds first, then remove the type.",
+      "wood_types_invalid": "Use 1 to 50 different names of at most 30 characters, without commas and not \"Geen houtsoort\"."
+    }
+  },
   "services": {
     "set_wood_types": {
       "name": "Set wood types",
       "description": "Sets the wood types of a wood shed. An empty list means no wood type.",
       "fields": {
-        "shed": {"name": "Wood shed", "description": "Number of the wood shed."},
-        "wood_types": {"name": "Wood types", "description": "One or more wood types stored in this shed."}
+        "shed": {
+          "name": "Wood shed",
+          "description": "Number of the wood shed."
+        },
+        "wood_types": {
+          "name": "Wood types",
+          "description": "One or more wood types stored in this shed."
+        }
       }
     }
   }

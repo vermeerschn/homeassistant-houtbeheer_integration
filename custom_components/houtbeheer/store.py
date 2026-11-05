@@ -5,7 +5,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import ServiceValidationError
 from homeassistant.helpers.storage import Store
-from .const import DOMAIN, HISTORY_SIZE, STORAGE_VERSION, WOOD_TYPES
+from .const import CONF_WOOD_TYPES, DEFAULT_WOOD_TYPES, DOMAIN, HISTORY_SIZE, STORAGE_VERSION
 
 def _empty_shed() -> dict:
     """Een leeg hok; gedeeld door nieuwe hokken en reset, zodat ze nooit uiteenlopen."""
@@ -19,10 +19,10 @@ def _empty_shed() -> dict:
         "history": [],
     }
 
-def _normalize_wood_types(wood_types) -> list[str]:
-    """Alleen bekende houtsoorten, zonder dubbels en altijd in dezelfde volgorde."""
+def _normalize_wood_types(wood_types, options) -> list[str]:
+    """Alleen bekende houtsoorten, zonder dubbels en in de volgorde van de ingestelde lijst."""
     chosen = set(wood_types or [])
-    return [wood for wood in WOOD_TYPES if wood in chosen]
+    return [wood for wood in options if wood in chosen]
 
 class WoodStore:
     def __init__(self, hass: HomeAssistant, entry: ConfigEntry) -> None:
@@ -50,7 +50,7 @@ class WoodStore:
             if "wood_types" not in shed:
                 # Migratie vanaf versie 1.4.1 en ouder: één houtsoort als tekst wordt een lijst.
                 # "Geen houtsoort" is geen houtsoort en wordt dus een lege lijst.
-                shed["wood_types"] = _normalize_wood_types([shed.get("wood_type")])
+                shed["wood_types"] = _normalize_wood_types([shed.get("wood_type")], self.wood_options)
             shed.pop("wood_type", None)
             if "history" not in shed:
                 # Migratie vanaf 1.6.0 en ouder: de laatst opgeslagen meting is het eerste punt.
@@ -59,6 +59,19 @@ class WoodStore:
                     if shed.get("moisture") is not None and shed.get("last_measurement")
                     else []
                 )
+
+    @property
+    def wood_options(self) -> list[str]:
+        """De houtsoorten die gekozen mogen worden (instelbaar in de opties van de integratie)."""
+        return list(self.entry.options.get(CONF_WOOD_TYPES, DEFAULT_WOOD_TYPES))
+
+    def wood_types_in_use(self) -> dict[str, list[int]]:
+        """Per houtsoort de hokken waarin ze nu gekozen is (ook verborgen hokken, hun data blijft bewaard)."""
+        used: dict[str, list[int]] = {}
+        for key, shed in sorted(self.data["sheds"].items(), key=lambda item: int(item[0])):
+            for wood in shed.get("wood_types", []):
+                used.setdefault(wood, []).append(int(key))
+        return used
 
     @property
     def shed_count(self) -> int:
@@ -77,7 +90,7 @@ class WoodStore:
         await self.async_save()
 
     async def async_set_wood_types(self, number: int, wood_types: list[str]) -> None:
-        self.shed(number)["wood_types"] = _normalize_wood_types(wood_types)
+        self.shed(number)["wood_types"] = _normalize_wood_types(wood_types, self.wood_options)
         await self.async_save()
 
     async def async_save_measurement(self, number: int) -> None:

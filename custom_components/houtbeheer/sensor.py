@@ -1,5 +1,5 @@
 from homeassistant.components.sensor import SensorDeviceClass, SensorEntity, SensorStateClass
-from .const import ATTR_MEASUREMENTS, ATTR_WOOD_OPTIONS, ATTR_WOOD_TYPES, NO_WOOD_TYPE, WOOD_TYPES
+from .const import ATTR_MEASUREMENTS, ATTR_WOOD_OPTIONS, ATTR_WOOD_TYPES, NO_WOOD_TYPE
 from .entity import WoodEntity
 async def async_setup_entry(hass, entry, async_add_entities):
     store = hass.data["houtbeheer"][entry.entry_id]
@@ -47,6 +47,6 @@ class WoodTypesSensor(WoodEntity, SensorEntity):
         return {
             **super().extra_state_attributes,
             ATTR_WOOD_TYPES: list(self.store.shed(self.number)["wood_types"]),
-            ATTR_WOOD_OPTIONS: list(WOOD_TYPES),
+            ATTR_WOOD_OPTIONS: self.store.wood_options,
         }
 

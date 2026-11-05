@@ -14,6 +14,7 @@ set_wood_types:
       selector:
         select:
           multiple: true
+          custom_value: true
           options:
             - Den
             - Eik

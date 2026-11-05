@@ -1,4 +1,7 @@
 {
-  "config": {"step": {"user": {"data": {"sheds": "Aantal houthokken"}}}},
+  "config": {
+    "step": {"user": {"data": {"sheds": "Aantal houthokken"}}},
+    "abort": {"already_configured": "Houtbeheer is al ingesteld."}
+  },
   "options": {"step": {"init": {"data": {"sheds": "Aantal houthokken"}}}}
 }

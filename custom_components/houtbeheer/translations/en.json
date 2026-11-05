@@ -1,0 +1,7 @@
+{
+  "config": {
+    "step": {"user": {"data": {"sheds": "Number of wood sheds"}}},
+    "abort": {"already_configured": "Houtbeheer is already set up."}
+  },
+  "options": {"step": {"init": {"data": {"sheds": "Number of wood sheds"}}}}
+}

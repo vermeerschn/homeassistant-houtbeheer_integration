@@ -5,6 +5,8 @@ from .const import DOMAIN
 
 class WoodEntity(Entity):
     _attr_has_entity_name = True
+    # De store pusht wijzigingen zelf via async_add_listener; pollen is overbodig.
+    _attr_should_poll = False
     def __init__(self, store, number: int) -> None:
         self.store = store
         self.number = number

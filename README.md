@@ -5,9 +5,13 @@ Een lokale Home Assistant custom integratie inclusief bijhorende Lovelace dashbo
 ## Functionaliteiten
 
 - **Flexibel aantal houthokken**: instelbaar bij installatie en later aanpasbaar via het tandwiel in de integratie.
-- **Uitgebreide houtsoorten**: Den, Eik, Beuk, Laurier, Kastanje, Es, Haagbeuk, Berk, Appel, Acacia, Esdoorn, Spar, Populier, Wilg en Anders.
+- **Uitgebreide houtsoorten**: Den, Eik, Beuk, Laurier, Kastanje, Es, Haagbeuk, Berk, Appel, Acacia, Esdoorn, Spar, Populier, Wilg en Anders. Een leeg of net gereset hok staat op *Geen houtsoort*.
 - **Handmatige metingen met bevestiging**: stel het gemeten vochtpercentage in en klik op **Meting opslaan** om zowel de waarde als het exacte tijdstip vast te leggen.
 - **Stookklaar-status**: automatische binary sensor die aangeeft of het hout onder 20% vocht zit.
+- **Actief hok**: schakelaar per hok om aan te geven uit welk hok je hout mag nemen, los van het vochtpercentage. Meerdere hokken kunnen actief zijn.
+- **Vuldatum**: per hok instelbaar, zonder tijdstip.
+- **Reset**: knop die een hok leegmaakt (houtsoort, invoer, meting, meetdatum, vuldatum en actief-status).
+- **Hernoemen kan**: de kaart herkent de entiteiten aan vaste attributen, ook nadat je ze hernoemd hebt.
 - **Eigen dashboardkaart**:
   - Duidelijk overzicht van alle hokken met houtsoort, actuele vochtigheid en stookstatus.
   - Snel schakelen tussen hokken en direct metingen doorvoeren.

@@ -1,4 +1,4 @@
-from homeassistant.components.sensor import SensorDeviceClass, SensorEntity
+from homeassistant.components.sensor import SensorDeviceClass, SensorEntity, SensorStateClass
 from .entity import WoodEntity
 async def async_setup_entry(hass, entry, async_add_entities):
     store = hass.data["houtbeheer"][entry.entry_id]
@@ -7,6 +7,8 @@ async def async_setup_entry(hass, entry, async_add_entities):
     async_add_entities(entities)
 class MoistureSensor(WoodEntity, SensorEntity):
     _attr_native_unit_of_measurement = "%"; _attr_icon = "mdi:water-percent"
+    # MEASUREMENT zorgt voor long-term statistics, zodat de droogcurve per hok bewaard blijft.
+    _attr_state_class = SensorStateClass.MEASUREMENT
     def __init__(self, store, number): super().__init__(store, number); self._attr_name = "Opgeslagen vochtgehalte"; self._attr_unique_id = f"houtbeheer_{number}_moisture"
     @property
     def native_value(self): return self.store.shed(self.number)["moisture"]

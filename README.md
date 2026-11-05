@@ -7,10 +7,11 @@ Een lokale Home Assistant custom integratie inclusief bijhorende Lovelace dashbo
 - **Flexibel aantal houthokken**: instelbaar bij installatie en later aanpasbaar via het tandwiel in de integratie.
 - **Meerdere houtsoorten per hok**: kies uit Den, Eik, Beuk, Laurier, Kastanje, Es, Haagbeuk, Berk, Appel, Acacia, Esdoorn, Spar, Populier, Wilg en Anders. De keuze wordt als lijst bewaard (attribuut `houtsoorten` van `sensor.houthok_N_houtsoorten`). Een leeg of net gereset hok staat op *Geen houtsoort*. Het vochtpercentage blijft per hok, niet per houtsoort.
 - **Handmatige metingen met bevestiging**: stel het gemeten vochtpercentage in en klik op **Meting opslaan** om zowel de waarde als het exacte tijdstip vast te leggen.
+- **Laatste 5 metingen per hok**: datum en percentage staan als lijst in het attribuut `metingen` van `sensor.houthok_N_opgeslagen_vochtgehalte`. De kaart toont ze als verloopgrafiek. Reset wist de geschiedenis.
 - **Stookklaar-status**: automatische binary sensor die aangeeft of het hout onder 20% vocht zit.
 - **Actief hok**: schakelaar per hok om aan te geven uit welk hok je hout mag nemen, los van het vochtpercentage. Meerdere hokken kunnen actief zijn.
 - **Vuldatum**: per hok instelbaar, zonder tijdstip.
-- **Reset**: knop die een hok leegmaakt (houtsoort, invoer, meting, meetdatum, vuldatum en actief-status).
+- **Reset**: knop die een hok leegmaakt (houtsoorten, invoer, meting, meetgeschiedenis, meetdatum, vuldatum en actief-status).
 - **Hernoemen kan**: de kaart herkent de entiteiten aan vaste attributen, ook nadat je ze hernoemd hebt.
 - **Eigen dashboardkaart**:
   - Duidelijk overzicht van alle hokken met houtsoort, actuele vochtigheid en stookstatus.

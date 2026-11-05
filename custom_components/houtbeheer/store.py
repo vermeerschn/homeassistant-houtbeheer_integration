@@ -5,7 +5,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import ServiceValidationError
 from homeassistant.helpers.storage import Store
-from .const import DOMAIN, STORAGE_VERSION, WOOD_TYPES
+from .const import DOMAIN, HISTORY_SIZE, STORAGE_VERSION, WOOD_TYPES
 
 def _empty_shed() -> dict:
     """Een leeg hok; gedeeld door nieuwe hokken en reset, zodat ze nooit uiteenlopen."""
@@ -16,6 +16,7 @@ def _empty_shed() -> dict:
         "last_measurement": None,
         "active": False,
         "filled_date": None,
+        "history": [],
     }
 
 def _normalize_wood_types(wood_types) -> list[str]:
@@ -51,6 +52,13 @@ class WoodStore:
                 # "Geen houtsoort" is geen houtsoort en wordt dus een lege lijst.
                 shed["wood_types"] = _normalize_wood_types([shed.get("wood_type")])
             shed.pop("wood_type", None)
+            if "history" not in shed:
+                # Migratie vanaf 1.6.0 en ouder: de laatst opgeslagen meting is het eerste punt.
+                shed["history"] = (
+                    [{"date": shed["last_measurement"], "moisture": shed["moisture"]}]
+                    if shed.get("moisture") is not None and shed.get("last_measurement")
+                    else []
+                )
 
     @property
     def shed_count(self) -> int:
@@ -80,6 +88,10 @@ class WoodStore:
             )
         shed["moisture"] = shed["draft_moisture"]
         shed["last_measurement"] = datetime.now().astimezone().isoformat()
+        shed["history"] = [
+            *shed["history"],
+            {"date": shed["last_measurement"], "moisture": shed["moisture"]},
+        ][-HISTORY_SIZE:]
         await self.async_save()
 
     async def async_reset_shed(self, number: int) -> None:
